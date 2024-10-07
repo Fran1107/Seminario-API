@@ -1,0 +1,24 @@
+### Recuperar todos los usuarios
+
+GET http://localhost:1822/user
+
+### Registrar un usuario
+
+POST http://localhost:1822/user/register
+Content-Type: application/json
+
+{
+    "nombre": "ender",
+    "apellido": "tomate",
+    "email": "ender@gmail.com",
+    "contrasena": "1234"
+}
+
+### Logear un usuario
+POST http://localhost:1822/user/login
+Content-Type: application/json
+
+{
+    "email": "ender@gmail.com",
+    "contrasena": "1234"
+}
