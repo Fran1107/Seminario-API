@@ -1,24 +1,275 @@
+### Recuperar todos los operador/admin
+
+GET http://localhost:3000/admin
+
+### Registrar un operador/admin
+
+POST http://localhost:3000/admin/register
+Content-Type: application/json
+
+{
+    "oper_cuil": 2060555675,
+    "oper_nombre": "operador2",
+    "oper_apellido": "operador2",
+    "oper_telefono": "3116611",
+    "email": "operador2@gmail.com",
+    "contrasena": "operador2",
+    "rol_id": 2
+}
+
 ### Recuperar todos los usuarios
 
-GET http://localhost:1822/user
+GET http://localhost:3000/user
 
 ### Registrar un usuario
 
-POST http://localhost:1822/user/register
+POST http://localhost:3000/user/register
 Content-Type: application/json
 
 {
-    "nombre": "ender",
-    "apellido": "tomate",
-    "email": "ender@gmail.com",
-    "contrasena": "1234"
+    "cli_cuil": 20177522363,
+    "cli_dni": 18166236,
+    "cli_nombre": "preuba",
+    "cli_apellido": "prueba",
+    "cli_email": "prueba12@gmail.com",
+    "cli_contrasena": "1234",
+    "prov_id": 1,
+    "local_codPostal":4400,
+    "cli_telefono":"3365991"
 }
 
 ### Logear un usuario
-POST http://localhost:1822/user/login
+POST http://localhost:3000/user/login
 Content-Type: application/json
 
 {
-    "email": "ender@gmail.com",
+    "email": "messi@gmail.com",
     "contrasena": "1234"
+}
+
+### Editar un usuario
+PATCH http://localhost:3000/user/update
+Content-Type: application/json
+
+{
+    "cli_nombre": "Leo",
+    "cli_apellido": "Messias"
+}
+
+### --------PRODUCTOS----------
+
+### Obtener todos los productos
+GET http://localhost:3000/products
+
+### Crear un producto
+POST http://localhost:3000/products/create
+Content-Type: application/json
+
+{
+    "cod_prod":"11122",
+    "prod_nombre": "Procesador 3",
+    "prod_precio": 240000,
+    "prod_descripcion": "AM4asdasd ",
+    "prod_stock": 5,
+    "cat_id": 1,
+    "marca_id": 2
+}
+
+### Crear un img a un product
+POST http://localhost:3000/imgproduct/addImage
+Content-Type: application/json
+
+{
+    "cod_prod": "1112224444",
+    "url_imagen": "https://imagenes.compragamer.com/productos/compragamer_Imganen_general_42445_Microfono_Razer_Seiren_V3_Mini_USB_8cef2665-grn.jpg"
+}
+
+### Obtener las imganes de un product
+GET http://localhost:3000/imgproduct/getImagesByProductId/794513899946
+
+
+### Editar un producto
+PATCH http://localhost:3000/products/update/561203948765
+Content-Type: application/json
+
+{
+    "prod_nombre": "Procesador AMD Ryzen 5 5600X 4.6GHz Turbo",
+    "prod_precio": 210000
+}
+
+### Eliminar un producto
+DELETE http://localhost:3000/products/delete/1
+
+### Obtener un producto por id
+GET http://localhost:3000/products/561203948765
+
+### --------ESPECIFICACIONES DE UN PRODUCTO----------
+
+### Crear una especificacion para un producto
+POST http://localhost:3000/especificacion/create
+Content-Type: application/json
+
+{
+    "esp_titulo": "COOLERS Y DISIPADORES",
+    "cod_prod": "77777777",
+    "nombres": [
+        {
+            "nombre_titulo": "Tdp Predeterminada",
+            "nombre_descripcion": "65 w"
+        },
+        {
+            "nombre_titulo": "Incluye Cooler Cpu",
+            "nombre_descripcion": "Si"
+        }
+    ]
+}
+
+### Obtener todas las especificaciones de un producto
+GET http://localhost:3000/especificacion/getEspecificacion/codprodje
+
+### --------CATEGORIAS----------
+
+### Obtener todas las categorias
+GET http://localhost:3000/categorias
+
+### Crear una categoria
+POST http://localhost:3000/categorias/create
+Content-Type: application/json
+
+{
+    "cat_nombre": "Placas de video"
+}
+
+### --------MARCAS----------
+
+### Obtener todas las marcas
+GET http://localhost:3000/marcas
+
+### --------PROVINCIAS-------------
+
+### Obtener todas las provincias
+GET http://localhost:3000/provincias
+
+### --------LOCALIDADES-------------
+
+### Obtener todas las localidades
+GET http://localhost:3000/localidades/1
+
+### --------SEARCH-------------
+
+###Obtener productos en la busqueda
+GET http://localhost:3000/products/search?q=mo&limit=5
+
+### --------CARRITO-------------
+
+### Obtener productos del carrito de un cliente
+GET http://localhost:3000/cart/getCart/20181222363
+
+### Meter productos al carrito
+POST http://localhost:3000/cart/addToCart
+Content-Type: application/json
+
+{
+    "cli_cuil": 20181222363,
+    "cod_prod": "374829105637",
+    "cantidad": 1
+}
+
+### Actualizar cantidad
+PATCH http://localhost:3000/cart/updateQuantity
+Content-Type: application/json
+
+{
+    "cli_cuil": 20181222363,
+    "cod_prod": "987654321098",
+    "cantidad": 1
+} 
+
+### Eliminar producto del carrito 
+DELETE http://localhost:3000/cart/removeFromCart
+Content-Type: application/json
+
+{
+    "cli_cuil": 20181222363,
+    "cod_prod": "374829105637"
+}
+
+### Eliminar todos los productos del carrito 
+DELETE http://localhost:3000/cart/clearCart/20181222363
+
+### --------DOMICILIO-------------
+
+### Obtener el domicilio de un cliente
+GET http://localhost:3000/domicilio/20181222363
+
+### Obtener el domicilio de un cliente
+GET http://localhost:3000/domicilio/getDom/1
+
+### --------COSTOS DE ENVIO-------------
+
+### Obtener costo de envio por provincia id
+GET http://localhost:3000/costoenvio/getCosto/1
+
+### --------METODO DE PAGO-------------
+
+### Obtener todos los metodos de pago
+GET http://localhost:3000/metpago
+
+### Obtener metodo de pago id
+GET http://localhost:3000/metpago/1
+
+### --------VENTAS-------------
+
+### Obtener todas las ventas
+GET http://localhost:3000/ventas
+
+### Obtener la venta de un cliente
+GET http://localhost:3000/ventas/20181222363
+
+### Obtener la venta de una factura de un cliente
+GET http://localhost:3000/ventas/getFac/100100022
+
+### Obtener la venta de una factura de un cliente
+GET http://localhost:3000/ventas/detVenta/100100022
+
+### Crear una venta con el detalle de venta (NO SE HACE DE ACA)
+POST http://localhost:3000/ventas/create
+Content-Type: application/json
+
+{
+    "cli_cuil": 20403167433,
+    "venta_total": 30000
+}
+
+### --------PAGOS-------------
+POST http://localhost:3000/pago
+Content-Type: application/json
+
+{
+    "metpago_id": 1,
+    "nro_factura": 100100006
+}
+
+### --------PEDIDOS POR NRO FACTURA-------------
+GET http://localhost:3000/pedido/100100022
+
+### --------PEDIDOS POR PEDIDO ID-------------
+GET http://localhost:3000/pedido/getPedido/2
+
+### --------ENVIOS POR NRO FACTURA-------------
+GET http://localhost:3000/envios/100100022
+
+### --------PAGOS POR NRO FACTURA-------------
+GET http://localhost:3000/pago/getPago/100100022
+
+### Obtener todos los metodos de pago
+GET http://localhost:3000/consulta/77777777
+
+### Obtener todos los metodos de pago
+PATCH http://localhost:3000/products/habilitar
+Content-Type: application/json
+
+{
+    "habilitar": true,
+    "cod_prod": "619745655311"
 }

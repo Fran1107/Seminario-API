@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken'
 dotenv.config()
 
 export class UserController {
-    
     static async getAll(req, res) {
         try {
             const users = await UserModel.getAll()
@@ -33,6 +32,7 @@ export class UserController {
         if (result.error) {
             return res.status(400).json({
                 status: 'error',
+                message: 'El usuario con este email ya existe! xd',
                 error: JSON.parse(result.error.message),
             })
         }
@@ -51,6 +51,7 @@ export class UserController {
                 return res.status(400).json({
                     status: 'error',
                     error: 'El usuario ingresado ya existe!',
+                    message: 'El usuario con este email ya existe!',
                 })
             }
 
@@ -76,13 +77,13 @@ export class UserController {
             })
         }
         const { email, contrasena } = result.data
-
         try {
             const user = await UserModel.login({ email })
             if (!user) {
                 return res.status(400).json({
                     status: 'error',
                     error: 'El usuario es incorrecto o no existe',
+                    message: 'El email ingresado es incorrecto o no existe',
                 })
             }
 
@@ -92,19 +93,25 @@ export class UserController {
                 return res.status(400).json({
                     status: 'error',
                     error: 'Contraseña incorrecta',
+                    message: 'La contraseña ingresada es incorrecta',
                 })
             }
 
             const { contrasena: _, ...publicUser } = user
 
-            const token = jwt.sign({user: publicUser }, process.env.TOP_SECRET, { expiresIn: '24h'})
+            const token = jwt.sign(
+                { user: publicUser },
+                process.env.TOP_SECRET,
+                { expiresIn: '24h' }
+            )
 
-            return res.cookie('access_token', token, {
-                httpOnly: true, // la cookie solo se puede acceder en el servidor (no desde js)
-                secure: process.env.NODE_ENV == 'production', // la cookie solo se puede acceder en https
-                sameSite: 'strict', // la cookie solo se puede acceder en el mismo dominio
-                maxAge: 1000 * 60 * 60 // la cookie tiene un tiempo de validez de 1 hora
-            })
+            return res
+                .cookie('access_token', token, {
+                    httpOnly: true, // la cookie solo se puede acceder en el servidor ,no desde js
+                    secure: process.env.NODE_ENV == 'production', // la cookie solo se puede acceder en https
+                    sameSite: 'lax', // la cookie solo se puede acceder en el mismo dominio
+                    maxAge: 1000 * 60 * 60, // la cookie tiene un tiempo de 1 hora
+                })
                 .json({
                     status: 'success',
                     user: publicUser,
@@ -117,36 +124,106 @@ export class UserController {
         }
     }
 
+    static async logout(req, res) {
+        res.clearCookie('access_token').json({
+            status: 'success',
+            message: 'Sesion finalizada correctamente',
+        })
+    }
+
     static async update(req, res) {
         const result = validatePartialUser(req.body)
-        const { id } = req.auth
+        const { usu_id } = req.auth
 
-        if(result.error){
+        if (result.error) {
             return res.status(400).json({
                 status: "error",
                 error: JSON.parse(result.error.message)
             })
         }
+
         const { data } = result
 
-        try{
-            const userEdited = await UserModel.update({id, input: data})
-
-            if(!userEdited){
+        try {
+            const userEdit = await UserModel.update({ id: usu_id, input: data })
+            if (!userEdit) {
                 return res.status(400).json({
                     status: "error",
-                    error: 'Ya existe ese email'
+                    error: 'Ya existe un usuario con ese nombre'
                 })
             }
 
             return res.json({
                 status: 'success',
-                user: userEdited
+                user: userEdit
             })
-        }catch (error){
+
+        } catch (error) {
+            console.error('Error en la actualización del usuario:', error);
             return res.status(500).json({
                 status: "error",
-                error: "Vaya algo salió mal!"
+                error: "Algo salio mal"
+            })
+        }
+        
+    }
+    
+
+    static async googleCallback(req, res) {
+        try {
+            const token = jwt.sign({ user: req.user }, process.env.TOP_SECRET, {
+                expiresIn: '24h',
+            })
+
+            res.cookie('access_token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV == 'production', // la cookie solo se puede acceder en https
+                maxAge: 24 * 60 * 60 * 1000,
+                sameSite: 'lax', //24h
+            })
+
+            res.cookie('user', JSON.stringify(req.user), {
+                httpOnly: false, // El frontend puede acceder a esta cookie
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 1000 * 60 * 60 * 24, // 1 día
+                sameSite: 'lax',
+            })
+
+            res.redirect('http://localhost:5173/')
+        } catch (error) {
+            console.log(error)
+            res.status(500).send('Error al autenticar con Google')
+        }
+    }
+
+    static async profile(req, res) {
+        const { id } = req.auth
+
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                error: 'Acceso no autorizado',
+            })
+        }
+
+        try {
+            const user = await UserModel.getById({ id })
+
+            if (!user) {
+                return res.status(400).json({
+                    status: 'error',
+                    error: 'El usuario no existe',
+                })
+            }
+
+            return res.json({
+                status: 'success',
+                user: user,
+            })
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                error: 'El usuario no existe',
             })
         }
     }
